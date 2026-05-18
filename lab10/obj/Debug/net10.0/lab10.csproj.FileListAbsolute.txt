@@ -1,0 +1,14 @@
+/home/openbag/Desktop/c#-labs/lab10/lab10/bin/Debug/net10.0/lab10
+/home/openbag/Desktop/c#-labs/lab10/lab10/bin/Debug/net10.0/lab10.deps.json
+/home/openbag/Desktop/c#-labs/lab10/lab10/bin/Debug/net10.0/lab10.runtimeconfig.json
+/home/openbag/Desktop/c#-labs/lab10/lab10/bin/Debug/net10.0/lab10.dll
+/home/openbag/Desktop/c#-labs/lab10/lab10/bin/Debug/net10.0/lab10.pdb
+/home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/lab10.GeneratedMSBuildEditorConfig.editorconfig
+/home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/lab10.AssemblyInfoInputs.cache
+/home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/lab10.AssemblyInfo.cs
+/home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/lab10.csproj.CoreCompileInputs.cache
+/home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/lab10.dll
+/home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/refint/lab10.dll
+/home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/lab10.pdb
+/home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/lab10.genruntimeconfig.cache
+/home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/ref/lab10.dll
