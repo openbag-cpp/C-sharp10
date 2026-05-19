@@ -20,7 +20,7 @@ namespace Компилятор
 
             File.WriteAllText(testFileName, testCode);
 
-            Console.WriteLine("=== ТЕСТИРОВАНИЕ МОДУЛЯ ВВОДА-ВЫВОДА ===");
+            Console.WriteLine("Тестирование модуля ввода-вывода");
             Console.WriteLine($"Загрузка файла: {testFileName}\n");
 
             InputOutput.Init(testFileName);

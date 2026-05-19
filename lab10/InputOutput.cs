@@ -135,7 +135,10 @@ namespace Компилятор
             {
                 ++errCount;
                 string s = "**";
-                if (errCount < 10) s += "0";
+                if (errCount < 10)
+                {
+                    s += "0";
+                }
                 s += $"{errCount}**";
 
                 int totalIndent = 7 + item.errorPosition.charNumber;
