@@ -27,12 +27,14 @@ namespace Компилятор
 
             while (!InputOutput.IsEndOfFile)
             {
-                if (InputOutput.positionNow.lineNumber == 1 && InputOutput.positionNow.charNumber == 8)
+                if (InputOutput.positionNow.lineNumber == 1
+                && InputOutput.positionNow.charNumber == 8)
                 {
                     InputOutput.Error(10, InputOutput.positionNow);
                 }
 
-                if (InputOutput.positionNow.lineNumber == 6 && InputOutput.positionNow.charNumber == 12)
+                if (InputOutput.positionNow.lineNumber == 6
+                && InputOutput.positionNow.charNumber == 12)
                 {
                     InputOutput.Error(4, InputOutput.positionNow);
                 }

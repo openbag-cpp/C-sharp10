@@ -12,3 +12,4 @@
 /home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/lab10.pdb
 /home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/lab10.genruntimeconfig.cache
 /home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/ref/lab10.dll
+/home/openbag/Desktop/c#-labs/lab10/lab10/obj/Debug/net10.0/lab10.sourcelink.json

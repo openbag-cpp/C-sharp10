@@ -30,16 +30,17 @@ namespace Компилятор
 
     class InputOutput
     {
-        const byte ERRMAX = 9;
+        private const byte ERRMAX = 9;
+
         public static char Ch { get; set; }
         public static TextPosition positionNow = new TextPosition(0, 0);
-
-        static string line = "";
-        static int lastInLine = 0;
         public static List<Err> err = new List<Err>();
-        static StreamReader File { get; set; }
-        static uint errCount = 0;
         public static bool IsEndOfFile { get; private set; } = false;
+
+        private static string line = "";
+        private static int lastInLine = 0;
+        private static StreamReader File { get; set; }
+        private static uint errCount = 0;
 
         public static void Init(string filePath)
         {
@@ -81,7 +82,9 @@ namespace Компилятор
             {
                 ListThisLine();
                 if (err.Count > 0)
+                {
                     ListErrors();
+                }
 
                 ReadNextLine();
 
@@ -96,6 +99,15 @@ namespace Компилятор
             {
                 positionNow.charNumber++;
                 Ch = line[positionNow.charNumber];
+            }
+        }
+
+        public static void Error(byte errorCode, TextPosition position)
+        {
+            if (err.Count <= ERRMAX)
+            {
+                Err e = new Err(position, errorCode);
+                err.Add(e);
             }
         }
 
@@ -122,14 +134,14 @@ namespace Компилятор
             }
         }
 
-        static void End()
+        private static void End()
         {
             Console.WriteLine(new string('-', 40));
             Console.WriteLine($"Компиляция завершена. Всего ошибок обнаружено: {errCount}!");
             Console.WriteLine(new string('-', 40));
         }
 
-        static void ListErrors()
+        private static void ListErrors()
         {
             foreach (Err item in err)
             {
@@ -146,14 +158,6 @@ namespace Компилятор
                 Console.WriteLine(s);
             }
         }
-
-        public static void Error(byte errorCode, TextPosition position)
-        {
-            if (err.Count <= ERRMAX)
-            {
-                Err e = new Err(position, errorCode);
-                err.Add(e);
-            }
-        }
     }
 }
+

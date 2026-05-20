@@ -1,3 +1,4 @@
 {
-    "dotnet.defaultSolution": "lab10.sln"
+    "dotnet.defaultSolution": "lab10.sln",
+    "FSharp.suggestGitignore": false
 }
