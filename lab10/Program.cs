@@ -5,48 +5,30 @@ namespace Компилятор
 {
     class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
-            string testFileName = "test.pas";
+            string testFilePath = "/home/openbag/Desktop/c#-labs/lab10/lab10/Keywords.cs";
+            string outputFilePath = "output.txt";
 
-            string testCode =
-                "program Test;\n" +
-                "var a, b: integer;\n" +
-                "begin\n" +
-                "  a := 10;\n" +
-                "  b := 05;\n" +
-                "  writeln(a)\n" +
-                "end.";
+            InputOutput.Init(testFilePath);
+            LexicalAnalyzer analyzer = new LexicalAnalyzer();
 
-            File.WriteAllText(testFileName, testCode);
-
-            Console.WriteLine("Тестирование модуля ввода-вывода");
-            Console.WriteLine($"Загрузка файла: {testFileName}\n");
-
-            InputOutput.Init(testFileName);
-
-            while (!InputOutput.IsEndOfFile)
+            using (StreamWriter writer = new StreamWriter(outputFilePath))
             {
-                if (InputOutput.positionNow.lineNumber == 1
-                && InputOutput.positionNow.charNumber == 8)
+                while (InputOutput.File != null)
                 {
-                    InputOutput.Error(10, InputOutput.positionNow);
-                }
+                    byte symbolCode = analyzer.NextSym();
 
-                if (InputOutput.positionNow.lineNumber == 6
-                && InputOutput.positionNow.charNumber == 12)
-                {
-                    InputOutput.Error(4, InputOutput.positionNow);
-                }
+                    if (symbolCode == 0)
+                    {
+                        break;
+                    }
 
-                InputOutput.NextCh();
+                    writer.Write(symbolCode + " ");
+                }
             }
 
-            if (File.Exists(testFileName))
-            {
-                File.Delete(testFileName);
-            }
-
+            Console.WriteLine($"\nКоды символов успешно сохранены в файл: {outputFilePath}");
             Console.ReadKey();
         }
     }

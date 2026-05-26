@@ -6,158 +6,296 @@ namespace Компилятор
 {
     struct TextPosition
     {
-        public uint lineNumber;
-        public byte charNumber;
+        private uint _lineNumber;
+        private byte _charNumber;
+
+        public uint LineNumber
+        {
+            get
+            {
+                return _lineNumber;
+            }
+            set
+            {
+                _lineNumber = value;
+            }
+        }
+
+        public byte CharNumber
+        {
+            get
+            {
+                return _charNumber;
+            }
+            set
+            {
+                _charNumber = value;
+            }
+        }
 
         public TextPosition(uint ln = 0, byte c = 0)
         {
-            lineNumber = ln;
-            charNumber = c;
+            _lineNumber = ln;
+            _charNumber = c;
         }
     }
 
     struct Err
     {
-        public TextPosition errorPosition;
-        public byte errorCode;
+        private TextPosition _errorPosition;
+        private byte _errorCode;
+
+        public TextPosition ErrorPosition
+        {
+            get
+            {
+                return _errorPosition;
+            }
+            set
+            {
+                _errorPosition = value;
+            }
+        }
+
+        public byte ErrorCode
+        {
+            get
+            {
+                return _errorCode;
+            }
+            set
+            {
+                _errorCode = value;
+            }
+        }
 
         public Err(TextPosition errorPosition, byte errorCode)
         {
-            this.errorPosition = errorPosition;
-            this.errorCode = errorCode;
+            _errorPosition = errorPosition;
+            _errorCode = errorCode;
+        }
+    }
+
+    class ErrorPrinter
+    {
+        public static void Print(byte code)
+        {
+            switch (code)
+            {
+                case 1:
+                    {
+                        Console.WriteLine("Недопустимый символ");
+                        break;
+                    }
+                case 2:
+                    {
+                        Console.WriteLine("Ожидался идентификатор");
+                        break;
+                    }
+                case 3:
+                    {
+                        Console.WriteLine("Ожидалась константа");
+                        break;
+                    }
+                case 4:
+                    {
+                        Console.WriteLine("Ожидался символ '='");
+                        break;
+                    }
+                default:
+                    {
+                        Console.WriteLine("Неизвестная ошибка");
+                        break;
+                    }
+            }
         }
     }
 
     class InputOutput
     {
-        private const byte ERRMAX = 9;
+        private const byte _errMax = 9;
 
-        public static char Ch { get; set; }
-        public static TextPosition positionNow = new TextPosition(0, 0);
-        public static List<Err> err = new List<Err>();
-        public static bool IsEndOfFile { get; private set; } = false;
+        private static char _ch;
+        public static char Ch
+        {
+            get
+            {
+                return _ch;
+            }
+        }
 
-        private static string line = "";
-        private static int lastInLine = 0;
-        private static StreamReader File { get; set; }
-        private static uint errCount = 0;
+        private static TextPosition _positionNow;
+        public static TextPosition PositionNow
+        {
+            get
+            {
+                return _positionNow;
+            }
+        }
+
+        private static string _line;
+        private static int _lastInLine;
+        private static List<Err> _err;
+
+        private static StreamReader _file;
+        public static StreamReader File
+        {
+            get
+            {
+                return _file;
+            }
+        }
+
+        private static uint _errCount;
+        private static Random _rnd;
+
+        static InputOutput()
+        {
+            _positionNow = new TextPosition(1, 0);
+            _line = "";
+            _lastInLine = 0;
+            _err = new List<Err>();
+            _errCount = 0;
+            _rnd = new Random();
+        }
 
         public static void Init(string filePath)
         {
-            if (!System.IO.File.Exists(filePath))
-            {
-                Console.WriteLine($"Ошибка: Файл {filePath} не найден.");
-                return;
-            }
+            _file = new StreamReader(filePath);
+            _errCount = 0;
+            _err = new List<Err>();
 
-            File = new StreamReader(filePath);
-            errCount = 0;
-            IsEndOfFile = false;
-            positionNow = new TextPosition(1, 0);
-            err = new List<Err>();
-
-            if (!File.EndOfStream)
+            if (!_file.EndOfStream)
             {
-                line = File.ReadLine();
-                line += " ";
-                lastInLine = line.Length - 1;
-                Ch = line[0];
+                _line = _file.ReadLine() + " ";
+                _lastInLine = _line.Length - 1;
+
+                _ch = _line[0];
+                _positionNow.LineNumber = 1;
+                _positionNow.CharNumber = 0;
             }
             else
             {
-                IsEndOfFile = true;
-                Ch = '\0';
+                End();
             }
         }
 
         public static void NextCh()
         {
-            if (IsEndOfFile)
+            if (_ch != ' ' && _rnd.Next(0, 100) < 5)
             {
-                Ch = '\0';
-                return;
+                byte randomCode = (byte)_rnd.Next(1, 5);
+                Error(randomCode, _positionNow);
             }
 
-            if (positionNow.charNumber >= lastInLine)
+            if (_positionNow.CharNumber == _lastInLine)
             {
                 ListThisLine();
-                if (err.Count > 0)
+
+                if (_err.Count > 0)
                 {
                     ListErrors();
                 }
 
                 ReadNextLine();
+                _positionNow.LineNumber = _positionNow.LineNumber + 1;
+                _positionNow.CharNumber = 0;
 
-                if (!IsEndOfFile)
+                if (_file != null)
                 {
-                    positionNow.lineNumber++;
-                    positionNow.charNumber = 0;
-                    Ch = line[0];
+                    _ch = _line[_positionNow.CharNumber];
+                }
+                else
+                {
+                    _ch = '\0';
                 }
             }
             else
             {
-                positionNow.charNumber++;
-                Ch = line[positionNow.charNumber];
-            }
-        }
-
-        public static void Error(byte errorCode, TextPosition position)
-        {
-            if (err.Count <= ERRMAX)
-            {
-                Err e = new Err(position, errorCode);
-                err.Add(e);
+                _positionNow.CharNumber++;
+                _ch = _line[_positionNow.CharNumber];
             }
         }
 
         private static void ListThisLine()
         {
-            Console.WriteLine($"{positionNow.lineNumber.ToString().PadLeft(4)} | {line.TrimEnd()}");
+            Console.WriteLine($"{_positionNow.LineNumber,-4} | {_line}");
         }
 
         private static void ReadNextLine()
         {
-            if (!File.EndOfStream)
+            if (!_file.EndOfStream)
             {
-                line = File.ReadLine();
-                line += " ";
-                lastInLine = line.Length - 1;
-                err = new List<Err>();
+                _line = _file.ReadLine() + " ";
+                _lastInLine = _line.Length - 1;
+                _err = new List<Err>();
             }
             else
             {
-                IsEndOfFile = true;
-                Ch = '\0';
-                File.Close();
                 End();
             }
         }
 
-        private static void End()
+        public static void End()
         {
-            Console.WriteLine(new string('-', 40));
-            Console.WriteLine($"Компиляция завершена. Всего ошибок обнаружено: {errCount}!");
-            Console.WriteLine(new string('-', 40));
+            Console.WriteLine($"\nКомпиляция завершена: ошибок — {_errCount}!");
+
+            if (_file != null)
+            {
+                _file.Close();
+                _file = null;
+            }
         }
 
-        private static void ListErrors()
+        public static void ListErrors()
         {
-            foreach (Err item in err)
+            foreach (Err item in _err)
             {
-                ++errCount;
-                string s = "**";
-                if (errCount < 10)
+                _errCount++;
+                string s = "*";
+
+                if (_errCount < 10)
                 {
                     s += "0";
                 }
-                s += $"{errCount}**";
 
-                int totalIndent = 7 + item.errorPosition.charNumber;
-                s = s.PadRight(totalIndent) + $"^ ошибка код {item.errorCode}";
-                Console.WriteLine(s);
+                s += $"{_errCount}*";
+
+                int targetPosition = 7 + item.ErrorPosition.CharNumber;
+
+                while (s.Length < targetPosition)
+                {
+                    s += " ";
+                }
+
+                s += $"^ ошибка код {item.ErrorCode}: ";
+                Console.Write(s);
+
+                ErrorPrinter.Print(item.ErrorCode);
+            }
+        }
+
+        public static void Error(byte errorCode, TextPosition position)
+        {
+            if (_err.Count <= _errMax)
+            {
+                bool exists = false;
+
+                foreach (Err e in _err)
+                {
+                    if (e.ErrorPosition.CharNumber == position.CharNumber)
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists)
+                {
+                    Err e = new Err(position, errorCode);
+                    _err.Add(e);
+                }
             }
         }
     }
 }
-
