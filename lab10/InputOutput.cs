@@ -11,26 +11,14 @@ namespace Компилятор
 
         public uint LineNumber
         {
-            get
-            {
-                return _lineNumber;
-            }
-            set
-            {
-                _lineNumber = value;
-            }
+            get { return _lineNumber; }
+            set { _lineNumber = value; }
         }
 
         public byte CharNumber
         {
-            get
-            {
-                return _charNumber;
-            }
-            set
-            {
-                _charNumber = value;
-            }
+            get { return _charNumber; }
+            set { _charNumber = value; }
         }
 
         public TextPosition(uint ln = 0, byte c = 0)
@@ -47,26 +35,14 @@ namespace Компилятор
 
         public TextPosition ErrorPosition
         {
-            get
-            {
-                return _errorPosition;
-            }
-            set
-            {
-                _errorPosition = value;
-            }
+            get { return _errorPosition; }
+            set { _errorPosition = value; }
         }
 
         public byte ErrorCode
         {
-            get
-            {
-                return _errorCode;
-            }
-            set
-            {
-                _errorCode = value;
-            }
+            get { return _errorCode; }
+            set { _errorCode = value; }
         }
 
         public Err(TextPosition errorPosition, byte errorCode)
@@ -102,6 +78,21 @@ namespace Компилятор
                         Console.WriteLine("Ожидался символ '='");
                         break;
                     }
+                case 203:
+                    {
+                        Console.WriteLine("Слишком большое целое число (превышен MaxInt)");
+                        break;
+                    }
+                case 204:
+                    {
+                        Console.WriteLine("Незакрытая строковая константа (пропущена кавычка)");
+                        break;
+                    }
+                case 205:
+                    {
+                        Console.WriteLine("Незакрытый многострочный комментарий");
+                        break;
+                    }
                 default:
                     {
                         Console.WriteLine("Неизвестная ошибка");
@@ -118,19 +109,13 @@ namespace Компилятор
         private static char _ch;
         public static char Ch
         {
-            get
-            {
-                return _ch;
-            }
+            get { return _ch; }
         }
 
         private static TextPosition _positionNow;
         public static TextPosition PositionNow
         {
-            get
-            {
-                return _positionNow;
-            }
+            get { return _positionNow; }
         }
 
         private static string _line;
@@ -140,10 +125,7 @@ namespace Компилятор
         private static StreamReader _file;
         public static StreamReader File
         {
-            get
-            {
-                return _file;
-            }
+            get { return _file; }
         }
 
         private static uint _errCount;

@@ -69,7 +69,7 @@ namespace Компилятор
             functionsy = 123,
             procedurensy = 124;
 
-        private static bool _буква
+        private static bool _symvol
         {
             get
             {
@@ -78,7 +78,7 @@ namespace Компилятор
             }
         }
 
-        private static bool _цифра
+        private static bool _digin
         {
             get
             {
@@ -97,143 +97,293 @@ namespace Компилятор
 
         public byte NextSym()
         {
-            while (InputOutput.Ch == ' ')
+            while (true)
             {
-                InputOutput.NextCh();
-            }
-
-            if (InputOutput.Ch == '\0')
-            {
-                return 0;
-            }
-
-            _token = new TextPosition(InputOutput.PositionNow.LineNumber, InputOutput.PositionNow.CharNumber);
-
-            if (_цифра)
-            {
-                byte digit;
-                Int16 maxint = Int16.MaxValue;
-                _nmbInt = 0;
-
-                while (InputOutput.Ch >= '0' && InputOutput.Ch <= '9')
+                while (InputOutput.Ch == ' ')
                 {
-                    digit = (byte)(InputOutput.Ch - '0');
+                    InputOutput.NextCh();
+                }
 
-                    if (_nmbInt < maxint / 10 || (_nmbInt == maxint / 10 && digit <= maxint % 10))
+                if (InputOutput.Ch == '\0')
+                {
+                    return 0;
+                }
+
+                _token = new TextPosition(InputOutput.PositionNow.LineNumber, InputOutput.PositionNow.CharNumber);
+
+                if (_digin)
+                {
+                    byte digit;
+                    Int16 maxint = Int16.MaxValue;
+                    _nmbInt = 0;
+
+                    while (InputOutput.Ch >= '0' && InputOutput.Ch <= '9')
                     {
-                        _nmbInt = 10 * _nmbInt + digit;
+                        digit = (byte)(InputOutput.Ch - '0');
+
+                        if (_nmbInt < maxint / 10 || (_nmbInt == maxint / 10 && digit <= maxint % 10))
+                        {
+                            _nmbInt = 10 * _nmbInt + digit;
+                        }
+                        else
+                        {
+                            InputOutput.Error(203, InputOutput.PositionNow);
+                            _nmbInt = 0;
+
+                            while (InputOutput.Ch >= '0' && InputOutput.Ch <= '9')
+                            {
+                                InputOutput.NextCh();
+                            }
+                        }
+
+                        InputOutput.NextCh();
+                    }
+
+                    _symbol = intc;
+                }
+                else if (_symvol)
+                {
+                    string name = "";
+
+                    while ((InputOutput.Ch >= 'a' && InputOutput.Ch <= 'z') ||
+                           (InputOutput.Ch >= 'A' && InputOutput.Ch <= 'Z') ||
+                           (InputOutput.Ch >= '0' && InputOutput.Ch <= '9'))
+                    {
+                        name += InputOutput.Ch;
+                        InputOutput.NextCh();
+                    }
+
+                    string lowerName = name.ToLower();
+                    byte length = (byte)lowerName.Length;
+
+                    if (_keywordsTable.Kw.ContainsKey(length)
+                        && _keywordsTable.Kw[length].ContainsKey(lowerName))
+                    {
+                        _symbol = _keywordsTable.Kw[length][lowerName];
                     }
                     else
                     {
-                        InputOutput.Error(203, InputOutput.PositionNow);
-                        _nmbInt = 0;
-
-                        while (InputOutput.Ch >= '0' && InputOutput.Ch <= '9')
-                        {
-                            InputOutput.NextCh();
-                        }
+                        _symbol = ident;
                     }
-
-                    InputOutput.NextCh();
-                }
-
-                _symbol = intc;
-            }
-            else if (_буква)
-            {
-                string name = "";
-
-                while ((InputOutput.Ch >= 'a' && InputOutput.Ch <= 'z') ||
-                       (InputOutput.Ch >= 'A' && InputOutput.Ch <= 'Z') ||
-                       (InputOutput.Ch >= '0' && InputOutput.Ch <= '9'))
-                {
-                    name += InputOutput.Ch;
-                    InputOutput.NextCh();
-                }
-
-                string lowerName = name.ToLower();
-                byte length = (byte)lowerName.Length;
-
-                if (_keywordsTable.Kw.ContainsKey(length)
-                    && _keywordsTable.Kw[length].ContainsKey(lowerName))
-                {
-                    _symbol = _keywordsTable.Kw[length][lowerName];
                 }
                 else
                 {
-                    _symbol = ident;
+                    switch (InputOutput.Ch)
+                    {
+                        case '<':
+                            {
+                                InputOutput.NextCh();
+
+                                if (InputOutput.Ch == '=')
+                                {
+                                    _symbol = laterequal;
+                                    InputOutput.NextCh();
+                                }
+                                else if (InputOutput.Ch == '>')
+                                {
+                                    _symbol = latergreater;
+                                    InputOutput.NextCh();
+                                }
+                                else
+                                {
+                                    _symbol = later;
+                                }
+                                break;
+                            }
+                        case ':':
+                            {
+                                InputOutput.NextCh();
+
+                                if (InputOutput.Ch == '=')
+                                {
+                                    _symbol = assign;
+                                    InputOutput.NextCh();
+                                }
+                                else
+                                {
+                                    _symbol = colon;
+                                }
+                                break;
+                            }
+                        case ';':
+                            {
+                                _symbol = semicolon;
+                                InputOutput.NextCh();
+                                break;
+                            }
+                        case '.':
+                            {
+                                InputOutput.NextCh();
+
+                                if (InputOutput.Ch == '.')
+                                {
+                                    _symbol = twopoints;
+                                    InputOutput.NextCh();
+                                }
+                                else
+                                {
+                                    _symbol = point;
+                                }
+                                break;
+                            }
+                        case '/':
+                            {
+                                InputOutput.NextCh();
+                                if (InputOutput.Ch == '/')
+                                {
+                                    while (InputOutput.Ch != '\n' && InputOutput.Ch != '\r' && InputOutput.Ch != '\0')
+                                    {
+                                        InputOutput.NextCh();
+                                    }
+                                    return NextSym();
+                                }
+                                else if (InputOutput.Ch == '*')
+                                {
+                                    InputOutput.NextCh();
+                                    bool closed = false;
+
+                                    while (InputOutput.Ch != '\0')
+                                    {
+                                        if (InputOutput.Ch == '*')
+                                        {
+                                            InputOutput.NextCh();
+                                            if (InputOutput.Ch == '/')
+                                            {
+                                                closed = true;
+                                                InputOutput.NextCh();
+                                                break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            InputOutput.NextCh();
+                                        }
+                                    }
+
+                                    if (!closed)
+                                    {
+                                        InputOutput.Error(205, InputOutput.PositionNow);
+                                        _symbol = 255;
+                                        return _symbol;
+                                    }
+
+                                    return NextSym();
+                                }
+                                else
+                                {
+                                    _symbol = slash;
+                                }
+                                break;
+                            }
+                        case '(':
+                            {
+                                InputOutput.NextCh();
+                                if (InputOutput.Ch == '*')
+                                {
+                                    InputOutput.NextCh();
+                                    bool closed = false;
+
+                                    while (InputOutput.Ch != '\0')
+                                    {
+                                        if (InputOutput.Ch == '*')
+                                        {
+                                            InputOutput.NextCh();
+                                            if (InputOutput.Ch == ')')
+                                            {
+                                                closed = true;
+                                                InputOutput.NextCh();
+                                                break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            InputOutput.NextCh();
+                                        }
+                                    }
+
+                                    if (!closed)
+                                    {
+                                        InputOutput.Error(205, InputOutput.PositionNow);
+                                        _symbol = 255;
+                                        return _symbol;
+                                    }
+
+                                    return NextSym();
+                                }
+                                else
+                                {
+                                    _symbol = leftpar;
+                                }
+                                break;
+                            }
+                        case '{':
+                            {
+                                InputOutput.NextCh();
+                                while (InputOutput.Ch != '}' && InputOutput.Ch != '\0')
+                                {
+                                    InputOutput.NextCh();
+                                }
+
+                                if (InputOutput.Ch == '\0')
+                                {
+                                    InputOutput.Error(205, InputOutput.PositionNow);
+                                    _symbol = 255;
+                                    return _symbol;
+                                }
+
+                                InputOutput.NextCh();
+                                return NextSym();
+                            }
+                        case '\'':
+                            {
+                                InputOutput.NextCh();
+                                bool closed = false;
+
+                                while (InputOutput.Ch != '\0' && InputOutput.Ch != '\n' && InputOutput.Ch != '\r')
+                                {
+                                    if (InputOutput.Ch == '\'')
+                                    {
+                                        closed = true;
+                                        InputOutput.NextCh();
+                                        break;
+                                    }
+                                    InputOutput.NextCh();
+                                }
+
+                                if (closed)
+                                {
+                                    _symbol = 83;
+                                }
+                                else
+                                {
+                                    InputOutput.Error(204, InputOutput.PositionNow);
+                                    _symbol = 255;
+                                }
+                                break;
+                            }
+                        case ')':
+                            {
+                                _symbol = rightpar;
+                                InputOutput.NextCh();
+                                break;
+                            }
+                        case '*':
+                            {
+                                _symbol = star;
+                                InputOutput.NextCh();
+                                break;
+                            }
+                        default:
+                            {
+                                InputOutput.Error(1, InputOutput.PositionNow);
+                                InputOutput.NextCh();
+                                _symbol = 255;
+                                break;
+                            }
+                    }
                 }
+                return _symbol;
             }
-            else
-            {
-                switch (InputOutput.Ch)
-                {
-                    case '<':
-                        {
-                            InputOutput.NextCh();
-
-                            if (InputOutput.Ch == '=')
-                            {
-                                _symbol = laterequal;
-                                InputOutput.NextCh();
-                            }
-                            else if (InputOutput.Ch == '>')
-                            {
-                                _symbol = latergreater;
-                                InputOutput.NextCh();
-                            }
-                            else
-                            {
-                                _symbol = later;
-                            }
-                            break;
-                        }
-                    case ':':
-                        {
-                            InputOutput.NextCh();
-
-                            if (InputOutput.Ch == '=')
-                            {
-                                _symbol = assign;
-                                InputOutput.NextCh();
-                            }
-                            else
-                            {
-                                _symbol = colon;
-                            }
-                            break;
-                        }
-                    case ';':
-                        {
-                            _symbol = semicolon;
-                            InputOutput.NextCh();
-                            break;
-                        }
-                    case '.':
-                        {
-                            InputOutput.NextCh();
-
-                            if (InputOutput.Ch == '.')
-                            {
-                                _symbol = twopoints;
-                                InputOutput.NextCh();
-                            }
-                            else
-                            {
-                                _symbol = point;
-                            }
-                            break;
-                        }
-                    default:
-                        {
-                            InputOutput.Error(1, InputOutput.PositionNow);
-                            InputOutput.NextCh();
-                            _symbol = 255;
-                            break;
-                        }
-                }
-            }
-            return _symbol;
         }
     }
 }
