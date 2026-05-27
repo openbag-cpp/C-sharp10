@@ -73,7 +73,8 @@ namespace Компилятор
         {
             get
             {
-                return char.IsLetter(InputOutput.Ch);
+                return (InputOutput.Ch >= 'a' && InputOutput.Ch <= 'z') ||
+                       (InputOutput.Ch >= 'A' && InputOutput.Ch <= 'Z');
             }
         }
 
@@ -81,9 +82,10 @@ namespace Компилятор
         {
             get
             {
-                return char.IsDigit(InputOutput.Ch);
+                return InputOutput.Ch >= '0' && InputOutput.Ch <= '9';
             }
         }
+
         private byte _symbol;
         private TextPosition _token;
         private string _addrName;
@@ -100,8 +102,13 @@ namespace Компилятор
                 InputOutput.NextCh();
             }
 
-            _token = new TextPosition(InputOutput.PositionNow.LineNumber,
-            InputOutput.PositionNow.CharNumber);
+            if (InputOutput.Ch == '\0')
+            {
+                return 0;
+            }
+
+            _token = new TextPosition(InputOutput.PositionNow.LineNumber, InputOutput.PositionNow.CharNumber);
+
             if (_цифра)
             {
                 byte digit;
@@ -219,7 +226,9 @@ namespace Компилятор
                         }
                     default:
                         {
+                            InputOutput.Error(1, InputOutput.PositionNow);
                             InputOutput.NextCh();
+                            _symbol = 255;
                             break;
                         }
                 }

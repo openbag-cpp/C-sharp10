@@ -182,6 +182,12 @@ namespace Компилятор
 
         public static void NextCh()
         {
+            if (_file == null)
+            {
+                _ch = '\0';
+                return;
+            }
+
             if (_ch != ' ' && _rnd.Next(0, 100) < 5)
             {
                 byte randomCode = (byte)_rnd.Next(1, 5);
@@ -224,7 +230,7 @@ namespace Компилятор
 
         private static void ReadNextLine()
         {
-            if (!_file.EndOfStream)
+            if (_file != null && !_file.EndOfStream)
             {
                 _line = _file.ReadLine() + " ";
                 _lastInLine = _line.Length - 1;

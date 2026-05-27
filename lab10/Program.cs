@@ -10,6 +10,13 @@ namespace Компилятор
             string testFilePath = "/home/openbag/Desktop/c#-labs/lab10/lab10/Keywords.cs";
             string outputFilePath = "output.txt";
 
+            if (!File.Exists(testFilePath))
+            {
+                Console.WriteLine($"Ошибка: Файл {testFilePath} не найден!");
+                Console.ReadKey();
+                return;
+            }
+
             InputOutput.Init(testFilePath);
             LexicalAnalyzer analyzer = new LexicalAnalyzer();
 
@@ -29,7 +36,6 @@ namespace Компилятор
             }
 
             Console.WriteLine($"\nКоды символов успешно сохранены в файл: {outputFilePath}");
-            Console.ReadKey();
         }
     }
 }
