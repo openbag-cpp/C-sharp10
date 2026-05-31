@@ -237,38 +237,6 @@ namespace Компилятор
                                     }
                                     return NextSym();
                                 }
-                                else if (InputOutput.Ch == '*')
-                                {
-                                    InputOutput.NextCh();
-                                    bool closed = false;
-
-                                    while (InputOutput.Ch != '\0')
-                                    {
-                                        if (InputOutput.Ch == '*')
-                                        {
-                                            InputOutput.NextCh();
-                                            if (InputOutput.Ch == '/')
-                                            {
-                                                closed = true;
-                                                InputOutput.NextCh();
-                                                break;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            InputOutput.NextCh();
-                                        }
-                                    }
-
-                                    if (!closed)
-                                    {
-                                        InputOutput.Error(205, InputOutput.PositionNow);
-                                        _symbol = 255;
-                                        return _symbol;
-                                    }
-
-                                    return NextSym();
-                                }
                                 else
                                 {
                                     _symbol = slash;
@@ -334,6 +302,13 @@ namespace Компилятор
                                 InputOutput.NextCh();
                                 return NextSym();
                             }
+                        case '}': 
+                            {
+                                InputOutput.Error(206, InputOutput.PositionNow); 
+                                InputOutput.NextCh();
+                                _symbol = 255;
+                                break;
+                            }
                         case '\'':
                             {
                                 InputOutput.NextCh();
@@ -361,7 +336,7 @@ namespace Компилятор
                                 }
                                 break;
                             }
-                        case ')':
+                        case ')': 
                             {
                                 _symbol = rightpar;
                                 InputOutput.NextCh();
@@ -369,8 +344,17 @@ namespace Компилятор
                             }
                         case '*':
                             {
-                                _symbol = star;
                                 InputOutput.NextCh();
+                                if (InputOutput.Ch == ')') 
+                                {
+                                    InputOutput.Error(206, InputOutput.PositionNow);
+                                    InputOutput.NextCh();
+                                    _symbol = 255;
+                                }
+                                else
+                                {
+                                    _symbol = star; 
+                                }
                                 break;
                             }
                         default:

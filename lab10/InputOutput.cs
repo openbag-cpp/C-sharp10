@@ -11,14 +11,22 @@ namespace Компилятор
 
         public uint LineNumber
         {
-            get { return _lineNumber; }
-            set { _lineNumber = value; }
+            get { 
+                return _lineNumber;
+                 }
+            set { 
+                _lineNumber = value;
+                 }
         }
 
         public byte CharNumber
         {
-            get { return _charNumber; }
-            set { _charNumber = value; }
+            get { 
+                return _charNumber; 
+                }
+            set { 
+                _charNumber = value;
+                 }
         }
 
         public TextPosition(uint ln = 0, byte c = 0)
@@ -35,8 +43,12 @@ namespace Компилятор
 
         public TextPosition ErrorPosition
         {
-            get { return _errorPosition; }
-            set { _errorPosition = value; }
+            get { 
+                return _errorPosition;
+                 }
+            set {
+                 _errorPosition = value;
+                }
         }
 
         public byte ErrorCode
@@ -93,6 +105,11 @@ namespace Компилятор
                         Console.WriteLine("Незакрытый многострочный комментарий");
                         break;
                     }
+                case 205:
+                {
+                    Console.WriteLine("Ошибка закрытой скобки (многострочный комментарий)");
+                    break;
+                }
                 default:
                     {
                         Console.WriteLine("Неизвестная ошибка");
