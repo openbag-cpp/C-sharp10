@@ -5,34 +5,32 @@ namespace Компилятор
     class LexicalAnalyzer
     {
         public const byte
-            star = 21, // *
-            slash = 60, // /
-            equal = 16, // =
-            comma = 20, // ,
-            semicolon = 14, // ;
-            colon = 5, // :
-            point = 61,	// .
-            arrow = 62,	// ^
-            leftpar = 9,	// (
-            rightpar = 4,	// )
-            lbracket = 11,	// [
-            rbracket = 12,	// ]
-            flpar = 63,	// {
-            frpar = 64,	// }
-            later = 65,	// <
-            greater = 66,	// >
-            laterequal = 67,	//  <=
-            greaterequal = 68,	//  >=
-            latergreater = 69,	//  <>
-            plus = 70,	// +
-            minus = 71,	// –
-            lcomment = 72,	//  (*
-            rcomment = 73,	//  *)
-            assign = 51,	//  :=
-            twopoints = 74,	//  ..
-            ident = 2,	// идентификатор
-            floatc = 82,	// вещественная константа
-            intc = 15,	// целая константа
+            star = 21,
+            slash = 60,
+            equal = 16,
+            comma = 20,
+            semicolon = 14,
+            colon = 5,
+            point = 61,
+            arrow = 62,
+            leftpar = 9,
+            rightpar = 4,
+            lbracket = 11,
+            rbracket = 12,
+            flpar = 63,
+            frpar = 64,
+            later = 65,
+            greater = 66,
+            laterequal = 67,
+            greaterequal = 68,
+            latergreater = 69,
+            plus = 70,
+            minus = 71,
+            assign = 51,
+            twopoints = 74,
+            ident = 2,
+            floatc = 82,
+            intc = 15,
             casesy = 31,
             elsesy = 32,
             filesy = 57,
@@ -85,7 +83,7 @@ namespace Компилятор
         {
             while (true)
             {
-                while (InputOutput.Ch == ' ')
+                while ((char.IsWhiteSpace(InputOutput.Ch) || InputOutput.Ch == (char)160) && InputOutput.Ch != '\0')
                 {
                     InputOutput.NextCh();
                 }
@@ -158,12 +156,24 @@ namespace Компилятор
                     {
                         case '+': _symbol = plus; InputOutput.NextCh(); break;
                         case '-': _symbol = minus; InputOutput.NextCh(); break;
+
+                        case '[': _symbol = lbracket; InputOutput.NextCh(); break;
+                        case ']': _symbol = rbracket; InputOutput.NextCh(); break;
+                        case '=': _symbol = equal; InputOutput.NextCh(); break;
+
                         case '<':
                             InputOutput.NextCh();
                             if (InputOutput.Ch == '=') { _symbol = laterequal; InputOutput.NextCh(); }
                             else if (InputOutput.Ch == '>') { _symbol = latergreater; InputOutput.NextCh(); }
                             else _symbol = later;
                             break;
+
+                        case '>':
+                            InputOutput.NextCh();
+                            if (InputOutput.Ch == '=') { _symbol = greaterequal; InputOutput.NextCh(); }
+                            else _symbol = greater;
+                            break;
+
                         case ':':
                             InputOutput.NextCh();
                             if (InputOutput.Ch == '=') { _symbol = assign; InputOutput.NextCh(); }
@@ -184,7 +194,7 @@ namespace Компилятор
                                 {
                                     InputOutput.NextCh();
                                 }
-                                return NextSym();
+                                continue;
                             }
                             else
                             {
@@ -223,7 +233,7 @@ namespace Компилятор
                                     return _symbol;
                                 }
 
-                                return NextSym();
+                                continue;
                             }
                             else
                             {
@@ -245,7 +255,7 @@ namespace Компилятор
                             }
 
                             InputOutput.NextCh();
-                            return NextSym();
+                            continue;
                         case '}':
                             InputOutput.Error(206, InputOutput.PositionNow);
                             InputOutput.NextCh();

@@ -17,6 +17,29 @@ namespace Компилятор
         {
             Next();
 
+            if (_curSym == LexicalAnalyzer.programsy)
+            {
+                Next();
+
+                if (_curSym == LexicalAnalyzer.ident)
+                {
+                    Next();
+                }
+                else
+                {
+                    Error(103);
+                }
+
+                if (_curSym == LexicalAnalyzer.semicolon)
+                {
+                    Next();
+                }
+                else
+                {
+                    Error(102);
+                }
+            }
+
             while (_curSym != 0)
             {
                 if (_curSym == LexicalAnalyzer.varsy)
@@ -26,6 +49,10 @@ namespace Компилятор
                 else if (_curSym == LexicalAnalyzer.beginsy || _curSym == LexicalAnalyzer.withsy || _curSym == LexicalAnalyzer.ident)
                 {
                     ParseStatement();
+                }
+                else if (_curSym == LexicalAnalyzer.point)
+                {
+                    Next();
                 }
                 else
                 {
@@ -74,7 +101,10 @@ namespace Компилятор
             else
             {
                 Error(101);
-                SkipTo(new HashSet<byte> { LexicalAnalyzer.ident, LexicalAnalyzer.arraysy, LexicalAnalyzer.recordsy, LexicalAnalyzer.semicolon });
+                if (_curSym != LexicalAnalyzer.ident && _curSym != LexicalAnalyzer.arraysy && _curSym != LexicalAnalyzer.recordsy)
+                {
+                    SkipTo(new HashSet<byte> { LexicalAnalyzer.arraysy, LexicalAnalyzer.recordsy, LexicalAnalyzer.semicolon });
+                }
             }
 
             ParseType();
@@ -141,40 +171,35 @@ namespace Компилятор
         {
             Next();
 
-            if (_curSym == LexicalAnalyzer.lbracket)
-            {
-                Next();
-            }
+            if (_curSym == LexicalAnalyzer.lbracket) Next();
             else
             {
                 Error(105);
+                if (_curSym != LexicalAnalyzer.intc)
+                {
+                    SkipTo(new HashSet<byte> { LexicalAnalyzer.ofsy, LexicalAnalyzer.semicolon });
+                }
             }
 
-            if (_curSym == LexicalAnalyzer.intc) Next(); else Error(106);
-
-            if (_curSym == LexicalAnalyzer.twopoints) Next(); else Error(107);
-
-            if (_curSym == LexicalAnalyzer.intc) Next(); else Error(106);
-
-            if (_curSym == LexicalAnalyzer.rbracket)
+            if (_curSym != LexicalAnalyzer.ofsy && _curSym != LexicalAnalyzer.semicolon)
             {
-                Next();
-            }
-            else
-            {
-                Error(108);
+                if (_curSym == LexicalAnalyzer.intc) Next(); else { Error(106); Next(); }
+                if (_curSym == LexicalAnalyzer.twopoints) Next(); else { Error(107); Next(); }
+                if (_curSym == LexicalAnalyzer.intc) Next(); else { Error(106); Next(); }
+
+                if (_curSym == LexicalAnalyzer.rbracket) Next();
+                else { Error(108); SkipTo(new HashSet<byte> { LexicalAnalyzer.ofsy, LexicalAnalyzer.semicolon }); }
             }
 
             if (_curSym == LexicalAnalyzer.ofsy)
             {
                 Next();
+                ParseType();
             }
             else
             {
-                Error(109);
+                if (_curSym != LexicalAnalyzer.semicolon) Error(109);
             }
-
-            ParseType();
         }
 
         private void ParseRecordType()
@@ -234,7 +259,10 @@ namespace Компилятор
                 {
                     Error(102);
                     SkipTo(new HashSet<byte> { LexicalAnalyzer.ident, LexicalAnalyzer.beginsy, LexicalAnalyzer.withsy, LexicalAnalyzer.endsy, LexicalAnalyzer.semicolon });
-                    if (_curSym == LexicalAnalyzer.semicolon) Next();
+                    if (_curSym == LexicalAnalyzer.semicolon)
+                    {
+                        Next();
+                    }
                 }
             }
 
